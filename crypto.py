@@ -28,7 +28,7 @@ def realTimeTradingAlgortithm():
             #print(f'Etherium: {cs.toString()}')
             tickClock.restart()
         if currencyClock.getElapsedTime() >= 60:
-            if investAmount < originalInvestAmount:
+            if money < originalInvestAmount:
                 investAmount = money
             else:
                 investAmount = originalInvestAmount
