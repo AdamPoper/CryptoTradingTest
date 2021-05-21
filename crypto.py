@@ -9,28 +9,32 @@ def realTimeTradingAlgortithm():
     eth_data_url = 'https://api.kraken.com/0/public/OHLC?pair=ETHUSD&interval=1'
     eth_usd_label = 'XETHZUSD'
     etherium = CryptoCurrency('ETH', eth_usd_label, eth_data_url)
-    realtime_url = 'https://api.kraken.com/0/public/Ticker?pair=ETHUSD'  
+    realtime_url = 'https://api.kraken.com/0/public/Ticker?pair=ETHUSD'
     tickClock = Clock()
     currencyClock = Clock()
     cs = CandleStick()
     originalInvestAmount = 1000
     money = originalInvestAmount
     investAmount = originalInvestAmount
-    coinsOwned = 0       
+    coinsOwned = 0
     tradingAbove5ma = False
     totalOrders = 0
     while True:
         if tickClock.getElapsedTime() >= 1:
             resp = requests.get(realtime_url)
             JSONdata = resp.json()
-            cs.close = float(JSONdata['result'][etherium.ticker_usd_label]['a'][0])             
-            candleStickOps(cs, cs.close)            
+            cs.close = float(JSONdata['result'][etherium.ticker_usd_label]['a'][0])
+            candleStickOps(cs, cs.close)
             #print(f'Etherium: {cs.toString()}')
-            tickClock.restart()  
+            tickClock.restart()
         if currencyClock.getElapsedTime() >= 60:
+            if investAmount < originalInvestAmount:
+                investAmount = money
+            else:
+                investAmount = originalInvestAmount
             etherium.candleSticks.append(cs)
             etherium.updateMA3()
-            etherium.updateMA5()            
+            etherium.updateMA5()
             if etherium.candleSticks[-1].ma3 > etherium.candleSticks[-1].ma5 and not tradingAbove5ma:
                 tradingAbove5ma = True
                 coinsOwned = investAmount / cs.close
@@ -46,13 +50,13 @@ def realTimeTradingAlgortithm():
             #etherium.displayData()
             cs = CandleStick()
             currencyClock.restart()
-             
+
 def candleStickOps(cs, currentPrice):
     # handle minute open conditions
     if cs.open == -1:
-        cs.open = currentPrice       
+        cs.open = currentPrice
     if cs.low == -1:
-        cs.low = currentPrice        
+        cs.low = currentPrice
     if cs.high == -1:
         cs.high = currentPrice
     # adjust highs and lows
